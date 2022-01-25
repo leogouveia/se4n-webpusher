@@ -10,7 +10,8 @@ require("dotenv").config();
 const app = express();
 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "frontend")));
+
+app.use(express.static(path.join(__dirname, "public")));
 
 if (process.env.NODE_ENV === "development") {
   app.use(
@@ -26,6 +27,10 @@ Parse.initialize(
   process.env.PARSE_JS_KEY,
   process.env.PARSE_MASTER_KEY
 );
+
+app.get("/ola", (req, res) => {
+  return res.send('ola');
+});
 
 app.get("/api/push/vapid-keys", (req, res) => {
   res.setHeader("Content-Type", "text/plain");
@@ -123,6 +128,11 @@ app.post("/api/push/send", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+app.get('/', (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+})
+
 const port = 3000;
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);

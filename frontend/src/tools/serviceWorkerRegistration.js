@@ -2,7 +2,7 @@ export const register = async () => {
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
       navigator.serviceWorker
-        .register("/service-worker.js", { scope: "/" })
+        .register("/push/service-worker.js", { scope: "/push/" })
         .then(
           (registration) => {
             console.log(
