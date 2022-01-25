@@ -1,0 +1,32 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "create-vapid-keys": "web-push generate-vapid-keys",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leogouveia/se4n-webpusher.git"
+  },
+  "author": "Leonardo de Albuquerque Gouveia <leogouv@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leogouveia/se4n-webpusher/issues"
+  },
+  "homepage": "https://github.com/leogouveia/se4n-webpusher#readme",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "dotenv": "^14.2.0",
+    "express": "^4.17.2",
+    "parse": "^3.4.1",
+    "web-push": "^3.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
