@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
-import { Box } from "@mui/system";
 import Dialog from "../components/Dialog";
-import { useNavigate } from "react-router-dom";
-import * as push from "../api/push";
+import { useNavigate, Link } from "react-router-dom";
+import SubscribePush from "../components/SubscribePush";
 
 const initialDialog = {
   title: "Notificacao",
@@ -13,6 +12,31 @@ const initialDialog = {
 
 function NotificationAccess() {
   const navigate = useNavigate();
+  const [isNotifEnabled, setIsNotifEnabled] = useState(false);
+
+  useEffect(() => {
+    if (!("Notification" in window)) {
+      setIsNotifEnabled(false);
+    } else if (Notification.permission === "granted") {
+      setIsNotifEnabled(true);
+    } else {
+      setIsNotifEnabled(false);
+    }
+  }, []);
+
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  useEffect(() => {
+    navigator.serviceWorker.ready
+      .then((regs) => regs.pushManager.getSubscription())
+      .then((subs) => {
+        if (!subs) {
+          setIsSubscribed(false);
+        } else {
+          setIsSubscribed(true);
+        }
+      });
+  }, []);
 
   const [dialog, setDialog] = React.useState({
     ...initialDialog,
@@ -36,7 +60,7 @@ function NotificationAccess() {
     });
   };
 
-  const handleSim = () => {
+  const handleSim = async () => {
     if (!("Notification" in window)) {
       showDialog("Este navegador não suporta notificações");
     } else if (Notification.permission === "denied") {
@@ -44,25 +68,24 @@ function NotificationAccess() {
     } else if (Notification.permission === "granted") {
       showDialog("Você já aceitou as notificações", () => {
         resetDialog();
-        navigate("/notification");
+        // navigate("/notification");
       });
     } else if (Notification.permission !== "denied") {
-      Notification.requestPermission(async (permission) => {
-        if (permission === "granted") {
-          new Notification("Olá! Bem vindo.");
-          navigate("/notification");
-          return;
-        }
-      });
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        new Notification("Olá! Bem vindo.");
+      } else {
+        showDialog("Você não aceitou receber notificações.");
+      }
     }
   };
 
   useEffect(() => {
     if ("Notification" in window) {
       console.log("notif perm", Notification.permission);
-      if (Notification.permission === "granted") {
-        navigate("/notification");
-      }
+      // if (Notification.permission === "granted") {
+      //   navigate("/notification");
+      // }
     }
   }, [navigate]);
 
@@ -70,11 +93,12 @@ function NotificationAccess() {
     showDialog("Você não aceitou as notificacoes");
   };
 
-  return (
-    <div>
-      <h1>Deseja receber notificações?</h1>
-      <Box
-        sx={{
+  const habilitarNotif = (
+    <>
+      <h1>Habilitar Notificações?</h1>
+      <div
+        style={{
+          width: "100%",
           display: "flex",
           justifyContent: "space-around",
         }}
@@ -85,7 +109,42 @@ function NotificationAccess() {
         <Button variant="outlined" onClick={handleSim}>
           SIM
         </Button>
-      </Box>
+      </div>
+    </>
+  );
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      {habilitarNotif}
+      {
+        <>
+          <h1>Assinar serviço de push?</h1>
+          <div
+            style={{
+              flex: "1",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <SubscribePush />
+          </div>
+        </>
+      }
+
+      {(isNotifEnabled || isSubscribed) && (
+        <div style={{ marginTop: "50px" }}>
+          <Button component={Link} to="/notification" variant="outlined">
+            Testar notificações
+          </Button>
+        </div>
+      )}
       <Dialog
         title={dialog.title}
         text={dialog.text}

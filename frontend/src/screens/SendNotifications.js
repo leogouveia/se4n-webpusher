@@ -1,14 +1,28 @@
-import { Button } from "@mui/material";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Button, Tooltip } from "@mui/material";
 import * as push from "../api/push";
 
 function SendNotifications() {
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  useEffect(() => {
+    navigator.serviceWorker.ready
+      .then((regs) => regs.pushManager.getSubscription())
+      .then((subs) => {
+        if (!subs) {
+          setIsSubscribed(false);
+        } else {
+          setIsSubscribed(true);
+        }
+      });
+  }, []);
+
   const sendSimpleNotification = () => {
     new Notification("Hi there!");
   };
 
-  const handleSendPushNotification = () => {
-    push.sendPush("Olá mundo");
+  const handleSendPushNotification = async () => {
+    await push.sendPush("Olá mundo");
   };
 
   return (
@@ -33,9 +47,20 @@ function SendNotifications() {
         <Button variant="outlined" onClick={sendSimpleNotification}>
           SIMPLES
         </Button>
-        <Button variant="outlined" onClick={handleSendPushNotification}>
-          PUSH
-        </Button>
+        <Tooltip
+          title={!isSubscribed ? "Assine o serviço de push para testar." : ""}
+          disableInteractive
+        >
+          <span>
+            <Button
+              variant="outlined"
+              onClick={handleSendPushNotification}
+              disabled={!isSubscribed}
+            >
+              PUSH
+            </Button>
+          </span>
+        </Tooltip>
       </div>
     </div>
   );
