@@ -1,6 +1,7 @@
 {
   "name": "frontend",
   "version": "0.1.0",
+  "homepage": "http://leogouveia.com/push",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.7.1",
